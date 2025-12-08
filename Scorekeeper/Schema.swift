@@ -48,6 +48,7 @@ func appDatabase() throws -> any DatabaseWriter {
         .execute(db)
     }
     try migrator.migrate(database)
+    try database.seed()
     return database
 }
 

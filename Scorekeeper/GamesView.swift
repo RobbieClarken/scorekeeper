@@ -26,7 +26,6 @@ struct GamesView: View {
 #Preview {
     let _ = prepareDependencies {
         try! $0.bootstrapDatabase()
-        try! $0.defaultDatabase.seed()
     }
     NavigationStack {
         GamesView()
