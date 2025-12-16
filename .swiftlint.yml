@@ -1,0 +1,10 @@
+line_length: 100
+
+opt_in_rules:
+  - empty_count
+  - indentation_width
+
+disabled_rules:
+  - identifier_name
+  - nesting
+  - trailing_comma

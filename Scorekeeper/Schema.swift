@@ -1,3 +1,4 @@
+import Dependencies
 import Foundation
 import SQLiteData
 
@@ -14,12 +15,14 @@ import SQLiteData
 }
 
 func appDatabase() throws -> any DatabaseWriter {
+    @Dependency(\.context) var context
     let database = try SQLiteData.defaultDatabase()
     var migrator = DatabaseMigrator()
     #if DEBUG
         migrator.eraseDatabaseOnSchemaChange = true
     #endif
     migrator.registerMigration("Create 'games' and 'players' tables") { db in
+        // swiftlint:disable indentation_width
         try #sql(
             """
             CREATE TABLE "games" (
@@ -46,9 +49,12 @@ func appDatabase() throws -> any DatabaseWriter {
             """
         )
         .execute(db)
+        // swiftlint:enable indentation_width
     }
     try migrator.migrate(database)
-    try database.seed()
+    if context == .preview {
+        try database.seed()
+    }
     return database
 }
 
