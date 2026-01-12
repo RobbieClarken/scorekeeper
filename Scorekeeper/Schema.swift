@@ -68,9 +68,14 @@ extension DatabaseWriter {
     func seed() throws {
         try write { db in
             try db.seed {
-                Game.Draft(title: "Family gin rummy")
+                Game.Draft(id: UUID(1), title: "Family gin rummy")
                 Game.Draft(title: "Weekly poker night")
                 Game.Draft(title: "Mahjong with grandma")
+
+                Player.Draft(gameID: UUID(1), name: "Robbie", score: 3)
+                Player.Draft(gameID: UUID(1), name: "Guisella", score: 4)
+                Player.Draft(gameID: UUID(1), name: "Henry", score: 2)
+                Player.Draft(gameID: UUID(1), name: "Clancy", score: 1)
             }
         }
     }
