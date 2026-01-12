@@ -14,6 +14,14 @@ import SQLiteData
     var score = 0
 }
 
+@Table struct PlayerAsset: Identifiable {
+    @Column(primaryKey: true)
+    let playerID: Player.ID
+    let imageData: Data
+    var id: Player.ID { playerID }
+}
+
+// swiftlint:disable:next function_body_length
 func appDatabase() throws -> any DatabaseWriter {
     @Dependency(\.context) var context
     var configuration = Configuration()
@@ -58,6 +66,16 @@ func appDatabase() throws -> any DatabaseWriter {
         )
         .execute(db)
         // swiftlint:enable indentation_width
+    }
+    migrator.registerMigration("Create 'playerAssets' tables") { db in
+        try #sql(
+            """
+            CREATE TABLE "playerAssets" (
+                "playerID" TEXT PRIMARY KEY NOT NULL REFERENCES "players"("id") ON DELETE CASCADE,
+                "imageData" BLOB NOT NULL
+            ) STRICT
+            """
+        ).execute(db)
     }
     try migrator.migrate(database)
     if context == .preview {
