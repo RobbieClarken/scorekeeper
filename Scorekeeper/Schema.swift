@@ -16,7 +16,15 @@ import SQLiteData
 
 func appDatabase() throws -> any DatabaseWriter {
     @Dependency(\.context) var context
-    let database = try SQLiteData.defaultDatabase()
+    var configuration = Configuration()
+    configuration.prepareDatabase { db in
+        #if DEBUG
+            db.trace {
+                print($0.expandedDescription)
+            }
+        #endif
+    }
+    let database = try SQLiteData.defaultDatabase(configuration: configuration)
     var migrator = DatabaseMigrator()
     #if DEBUG
         migrator.eraseDatabaseOnSchemaChange = true
