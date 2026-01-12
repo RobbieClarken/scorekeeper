@@ -1,34 +1,99 @@
 import SQLiteData
 import SwiftUI
 
-let NO_PLAYERS_CHANGE_ME = true
-let PLAYERS_CHANGE_ME: [Player] = []
-
-struct GameView: View {
-
-    @State var isGamePresented_CHANGE_ME = false
-    @State var playerName_CHANGE_ME = ""
+@Observable class GameModel {
+    let game: Game
+    var isNewPlayerAlertPresented = false
+    var newPlayerName = ""
+    var sortAscending = false { didSet { Task { await reloadData() } } }
+    @ObservationIgnored @FetchAll(Player.none) var players
+    @ObservationIgnored @Dependency(\.defaultDatabase) var database
 
     init(game: Game) {
+        self.game = game
+    }
+
+    func addPlayerButtonTapped() {
+        newPlayerName = ""
+        isNewPlayerAlertPresented = true
+    }
+
+    func decrementButtonTapped(for player: Player) {
+        withErrorReporting {
+            try database.write { db in
+                try Player.find(player.id).update { $0.score -= 1 }.execute(db)
+            }
+        }
+    }
+
+    func incrementButtonTapped(for player: Player) {
+        withErrorReporting {
+            try database.write { db in
+                try Player.find(player.id).update { $0.score += 1 }.execute(db)
+            }
+        }
+    }
+
+    func deletePlayers(at offsets: IndexSet) {
+        withErrorReporting {
+            try database.write { db in
+                try Player.find(offsets.map { players[$0].id }).delete().execute(db)
+            }
+        }
+    }
+
+    func toggleSortButtonTapped() {
+        sortAscending.toggle()
+    }
+
+    func saveNewPlayerButtonTapped() {
+        withErrorReporting {
+            try database.write { db in
+                try Player.insert { Player.Draft(gameID: game.id, name: newPlayerName, score: 0) }
+                    .execute(db)
+            }
+        }
+    }
+
+    func task() async {
+        await reloadData()
+    }
+
+    private func reloadData() async {
+        await withErrorReporting {
+            _ = try await $players.load(
+                Player
+                    .where { $0.gameID.eq(game.id) }
+                    .order { if sortAscending { $0.score.asc() } else { $0.score.desc() } },
+                animation: .default,
+            )
+        }
+    }
+}
+
+struct GameView: View {
+    @State var model: GameModel
+
+    init(game: Game) {
+        _model = State(wrappedValue: GameModel(game: game))
     }
 
     var body: some View {
         Form {
-            if NO_PLAYERS_CHANGE_ME {
+            if model.players.isEmpty {
                 ContentUnavailableView {
                     Label("No players", systemImage: "person.3.fill")
                 } description: {
-                    Button("Add player") {  // Action
-                    }
+                    Button("Add player") { model.addPlayerButtonTapped() }
                 }
             } else {
                 Section {
-                    ForEach(PLAYERS_CHANGE_ME) { player in
+                    ForEach(model.players) { player in
                         HStack {
                             Button {
                                 // Action
                             } label: {
-                                if let image = UIImage(data: "CHANGE_ME".data(using: .utf8)!) {
+                                if let image = UIImage(data: Data("CHANGE_ME".utf8)) {
                                     Image(uiImage: image)
                                         .resizable()
                                         .scaledToFill()
@@ -44,36 +109,36 @@ struct GameView: View {
                             Text(player.name)
                             Spacer()
                             Button {
-                                // Action
+                                model.decrementButtonTapped(for: player)
                             } label: {
                                 Image(systemName: "minus")
                             }
                             Text("\(player.score)")
                             Button {
-                                // Action
+                                model.incrementButtonTapped(for: player)
                             } label: {
                                 Image(systemName: "plus")
                             }
                         }
                         .buttonStyle(.borderless)
                     }
-                    .onDelete { _ in
-                        // CHANGE_ME
+                    .onDelete { offsets in
+                        model.deletePlayers(at: offsets)
                     }
                 } header: {
                     HStack {
                         Text("Players")
                         Spacer()
                         Button {
-                            // Action
+                            model.toggleSortButtonTapped()
                         } label: {
-                            Image(systemName: "arrow.down")
+                            Image(systemName: model.sortAscending ? "arrow.down" : "arrow.up")
                         }
                     }
                 }
             }
         }
-        .navigationTitle("CHANGE_ME")
+        .navigationTitle(model.game.title)
         .toolbar {
             ToolbarItem {
                 Button {
@@ -84,18 +149,20 @@ struct GameView: View {
             }
             ToolbarItem {
                 Button {
-                    // Action
+                    model.addPlayerButtonTapped()
                 } label: {
                     Image(systemName: "plus")
                 }
-                .alert("New player", isPresented: $isGamePresented_CHANGE_ME) {
-                    TextField("Player name", text: $playerName_CHANGE_ME)
-                    Button("Save") {  // Action
+                .alert("New player", isPresented: $model.isNewPlayerAlertPresented) {
+                    TextField("Player name", text: $model.newPlayerName)
+                    Button("Save") {
+                        model.saveNewPlayerButtonTapped()
                     }
                     Button("Cancel", role: .cancel) {}
                 }
             }
         }
+        .task { await model.task() }
     }
 }
 
