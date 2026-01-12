@@ -13,6 +13,7 @@ import SwiftUI
     var isPlayerPhotoPickerPresented = false
     var playerPhotoPickerPresented: Player?
     var newPlayerName = ""
+    var playerPhotoConfirmationDialog: Player?
     var photosPickerItem: PhotosPickerItem? {
         didSet {
             updatePlayerImageTask?.cancel()
@@ -49,9 +50,28 @@ import SwiftUI
         }
     }
 
-    func photoButtonTapped(for player: Player) {
+    func photoButtonTapped(for row: Row) {
+        if row.imageData == nil {
+            isPlayerPhotoPickerPresented = true
+            playerPhotoPickerPresented = row.player
+        } else {
+            playerPhotoConfirmationDialog = row.player
+        }
+    }
+
+    func selectNewPhotoButtonTapped() {
+        guard let player = playerPhotoPickerPresented else { return }
         isPlayerPhotoPickerPresented = true
         playerPhotoPickerPresented = player
+    }
+
+    func removePhotoButtonTapped() {
+        guard let player = playerPhotoPickerPresented else { return }
+        withErrorReporting {
+            try database.write { db in
+                try PlayerAsset.find(player.id).delete().execute(db)
+            }
+        }
     }
 
     func deletePlayers(at offsets: IndexSet) {
@@ -132,7 +152,7 @@ struct GameView: View {
                     ForEach(model.rows, id: \.player.id) { row in
                         HStack {
                             Button {
-                                model.photoButtonTapped(for: row.player)
+                                model.photoButtonTapped(for: row)
                             } label: {
                                 if let imageData = row.imageData,
                                     let image = UIImage(data: imageData)
@@ -148,6 +168,19 @@ struct GameView: View {
                             .frame(width: 44, height: 44)
                             .clipShape(Circle())
                             .transaction { $0.animation = nil }
+                            .confirmationDialog(
+                                "Change or clear photo",
+                                isPresented: $model.playerPhotoConfirmationDialog[
+                                    isPresenting: row.player.id
+                                ]
+                            ) {
+                                Button("Select new photo") {
+                                    model.selectNewPhotoButtonTapped()
+                                }
+                                Button("Remove photo", role: .destructive) {
+                                    model.removePhotoButtonTapped()
+                                }
+                            }
 
                             Text(row.player.name)
                             Spacer()
@@ -208,6 +241,13 @@ struct GameView: View {
         .task { await model.task() }
         .photosPicker(
             isPresented: $model.isPlayerPhotoPickerPresented, selection: $model.photosPickerItem)
+    }
+}
+
+extension Optional {
+    subscript(isPresenting id: Wrapped.ID) -> Bool where Wrapped: Identifiable {
+        get { self?.id == id }
+        set { if !newValue { self = nil } }
     }
 }
 
