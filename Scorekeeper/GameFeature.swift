@@ -80,7 +80,7 @@ struct GameView: View {
 
     var body: some View {
         Form {
-            if model.players.isEmpty {
+            if !model.$players.isLoading, model.players.isEmpty {
                 ContentUnavailableView {
                     Label("No players", systemImage: "person.3.fill")
                 } description: {
