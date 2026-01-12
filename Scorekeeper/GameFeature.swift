@@ -1,3 +1,4 @@
+import PhotosUI
 import SQLiteData
 import SwiftUI
 
@@ -9,8 +10,17 @@ import SwiftUI
 
     let game: Game
     var isNewPlayerAlertPresented = false
+    var isPlayerPhotoPickerPresented = false
+    var playerPhotoPickerPresented: Player?
     var newPlayerName = ""
+    var photosPickerItem: PhotosPickerItem? {
+        didSet {
+            updatePlayerImageTask?.cancel()
+            updatePlayerImageTask = Task { await updatePlayerImage() }
+        }
+    }
     var sortAscending = false { didSet { Task { await reloadData() } } }
+    var updatePlayerImageTask: Task<Void, Never>?
     @ObservationIgnored @FetchAll var rows: [Row]
     @ObservationIgnored @Dependency(\.defaultDatabase) var database
 
@@ -37,6 +47,11 @@ import SwiftUI
                 try Player.find(player.id).update { $0.score += 1 }.execute(db)
             }
         }
+    }
+
+    func photoButtonTapped(for player: Player) {
+        isPlayerPhotoPickerPresented = true
+        playerPhotoPickerPresented = player
     }
 
     func deletePlayers(at offsets: IndexSet) {
@@ -76,6 +91,25 @@ import SwiftUI
             )
         }
     }
+
+    private func updatePlayerImage() async {
+        guard let photosPickerItem, let playerPhotoPickerPresented else { return }
+        do {
+            guard let imageData = try await photosPickerItem.loadTransferable(type: Data.self)
+            else { return }
+            try await database.write { db in
+                try PlayerAsset.upsert {
+                    PlayerAsset(
+                        playerID: playerPhotoPickerPresented.id,
+                        imageData: imageData,
+                    )
+                }
+                .execute(db)
+            }
+        } catch {
+            // Show error to user
+        }
+    }
 }
 
 struct GameView: View {
@@ -98,7 +132,7 @@ struct GameView: View {
                     ForEach(model.rows, id: \.player.id) { row in
                         HStack {
                             Button {
-                                // Action
+                                model.photoButtonTapped(for: row.player)
                             } label: {
                                 if let imageData = row.imageData,
                                     let image = UIImage(data: imageData)
@@ -172,6 +206,8 @@ struct GameView: View {
             }
         }
         .task { await model.task() }
+        .photosPicker(
+            isPresented: $model.isPlayerPhotoPickerPresented, selection: $model.photosPickerItem)
     }
 }
 
