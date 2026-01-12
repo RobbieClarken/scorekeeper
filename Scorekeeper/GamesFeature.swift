@@ -7,13 +7,7 @@ struct GamesView: View {
         let playerCount: Int
     }
 
-    @FetchAll(
-        Game
-            .group(by: \.id)
-            .leftJoin(Player.all) { $0.id.eq($1.gameID) }
-            .select { Row.Columns(game: $0, playerCount: $1.count()) },
-        animation: .default,
-    ) var rows
+    @FetchAll var rows: [Row]
     @State var isNewGamePresented = false
     @State var newGameTitle = ""
     @Dependency(\.defaultDatabase) var database
@@ -68,6 +62,18 @@ struct GamesView: View {
                 }
             }
             Button(role: .cancel) {}
+        }
+        .task {
+            await withErrorReporting {
+                try await $rows.load(
+                    Game
+                        .group(by: \.id)
+                        .leftJoin(Player.all) { $0.id.eq($1.gameID) }
+                        .select { Row.Columns(game: $0, playerCount: $1.count()) },
+                    animation: .default,
+                )
+                .task
+            }
         }
     }
 }
