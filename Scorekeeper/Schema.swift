@@ -26,6 +26,7 @@ func appDatabase() throws -> any DatabaseWriter {
     @Dependency(\.context) var context
     var configuration = Configuration()
     configuration.prepareDatabase { db in
+        try db.attachMetadatabase()
         #if DEBUG
             db.trace {
                 print($0.expandedDescription)
