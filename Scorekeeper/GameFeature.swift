@@ -1,3 +1,4 @@
+import CloudKit
 import PhotosUI
 import SQLiteData
 import SwiftUI
@@ -22,8 +23,10 @@ import SwiftUI
     }
     var sortAscending = false { didSet { Task { await reloadData() } } }
     var updatePlayerImageTask: Task<Void, Never>?
+    var sharedRecord: SharedRecord?
     @ObservationIgnored @FetchAll var rows: [Row]
     @ObservationIgnored @Dependency(\.defaultDatabase) var database
+    @ObservationIgnored @Dependency(\.defaultSyncEngine) var syncEngine
 
     init(game: Game) {
         self.game = game
@@ -91,6 +94,15 @@ import SwiftUI
             try database.write { db in
                 try Player.insert { Player.Draft(gameID: game.id, name: newPlayerName, score: 0) }
                     .execute(db)
+            }
+        }
+    }
+
+    func shareButtonTapped() async {
+        await withErrorReporting {
+            sharedRecord = try await syncEngine.share(record: game) {
+                $0[CKShare.SystemFieldKey.title] = game.title
+                $0[CKShare.SystemFieldKey.thumbnailImageData] = nil
             }
         }
     }
@@ -218,7 +230,7 @@ struct GameView: View {
         .toolbar {
             ToolbarItem {
                 Button {
-                    // Action
+                    Task { await model.shareButtonTapped() }
                 } label: {
                     Image(systemName: "square.and.arrow.up")
                 }
@@ -239,8 +251,11 @@ struct GameView: View {
             }
         }
         .task { await model.task() }
+        .sheet(item: $model.sharedRecord) { CloudSharingView(sharedRecord: $0) }
         .photosPicker(
-            isPresented: $model.isPlayerPhotoPickerPresented, selection: $model.photosPickerItem)
+            isPresented: $model.isPlayerPhotoPickerPresented,
+            selection: $model.photosPickerItem,
+        )
     }
 }
 
