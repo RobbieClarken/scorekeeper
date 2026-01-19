@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DC16B0D52F1E082F0035A3BF /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = DC16B0D42F1E082F0035A3BF /* Dependencies */; };
 		DC5C84572EE69D7A005AEEFA /* SQLiteData in Frameworks */ = {isa = PBXBuildFile; productRef = DC5C84562EE69D7A005AEEFA /* SQLiteData */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC5C84572EE69D7A005AEEFA /* SQLiteData in Frameworks */,
+				DC16B0D52F1E082F0035A3BF /* Dependencies in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			name = Scorekeeper;
 			packageProductDependencies = (
 				DC5C84562EE69D7A005AEEFA /* SQLiteData */,
+				DC16B0D42F1E082F0035A3BF /* Dependencies */,
 			);
 			productName = Scorekeeper;
 			productReference = DC5C84472EE69D20005AEEFA /* Scorekeeper.app */;
@@ -115,6 +118,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				DC5C84552EE69D7A005AEEFA /* XCRemoteSwiftPackageReference "sqlite-data" */,
+				DC16B0D32F1E082F0035A3BF /* XCRemoteSwiftPackageReference "swift-dependencies" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DC5C84482EE69D20005AEEFA /* Products */;
@@ -360,6 +364,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		DC16B0D32F1E082F0035A3BF /* XCRemoteSwiftPackageReference "swift-dependencies" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-dependencies";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.10.1;
+			};
+		};
 		DC5C84552EE69D7A005AEEFA /* XCRemoteSwiftPackageReference "sqlite-data" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/sqlite-data";
@@ -371,6 +383,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		DC16B0D42F1E082F0035A3BF /* Dependencies */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DC16B0D32F1E082F0035A3BF /* XCRemoteSwiftPackageReference "swift-dependencies" */;
+			productName = Dependencies;
+		};
 		DC5C84562EE69D7A005AEEFA /* SQLiteData */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DC5C84552EE69D7A005AEEFA /* XCRemoteSwiftPackageReference "sqlite-data" */;
