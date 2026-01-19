@@ -29,6 +29,7 @@ func appDatabase() throws -> any DatabaseWriter {
         try db.attachMetadatabase()
         #if DEBUG
             db.trace {
+                guard !SyncEngine.isSynchronizing else { return }
                 print($0.expandedDescription)
             }
         #endif
