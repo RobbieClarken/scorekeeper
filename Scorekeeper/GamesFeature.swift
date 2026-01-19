@@ -8,40 +8,27 @@ struct GamesView: View {
         let playerCount: Int
     }
 
-    @FetchAll var rows: [Row]
+    @FetchAll var sharedRows: [Row]
+    @FetchAll var privateRows: [Row]
     @State var isNewGamePresented = false
     @State var newGameTitle = ""
     @Dependency(\.defaultDatabase) var database
 
     var body: some View {
         List {
-            ForEach(rows, id: \.game.id) { row in
-                NavigationLink {
-                    GameView(game: row.game)
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(row.game.title).font(.headline)
-                            if row.isShared {
-                                Text("\(Image(systemName: "network")) Shared")
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        Spacer()
-                        Text("\(row.playerCount)")
-                        Image(systemName: "person.2.fill").foregroundStyle(.gray)
-                    }
+            if !privateRows.isEmpty {
+                Section {
+                    GamesSection(rows: privateRows)
+                } header: {
+                    Text("Private games")
                 }
             }
-            .onDelete { offsets in
-                withErrorReporting {
-                    try database.write { db in
-                        try Game.find(offsets.map { rows[$0].game.id })
-                            .delete()
-                            .execute(db)
-                    }
+            if !sharedRows.isEmpty {
+                Section {
+                    GamesSection(rows: sharedRows)
+                } header: {
+                    Text("Shared games")
                 }
-
             }
         }
         .navigationTitle("Games")
@@ -72,22 +59,64 @@ struct GamesView: View {
         }
         .task {
             await withErrorReporting {
-                try await $rows.load(
+                let baseQuery =
                     Game
-                        .group(by: \.id)
-                        .leftJoin(Player.all) { $0.id.eq($1.gameID) }
-                        .order { $1.count().desc() }
-                        .leftJoin(SyncMetadata.all) { $0.syncMetadataID.eq($2.id) }
-                        .select {
-                            GamesView.Row.Columns(
-                                game: $0,
-                                isShared: $2.isShared.ifnull(false),
-                                playerCount: $1.count(),
-                            )
-                        },
+                    .group(by: \.id)
+                    .leftJoin(Player.all) { $0.id.eq($1.gameID) }
+                    .order { $1.count().desc() }
+                    .leftJoin(SyncMetadata.all) { $0.syncMetadataID.eq($2.id) }
+                    .select {
+                        GamesView.Row.Columns(
+                            game: $0,
+                            isShared: $2.isShared.ifnull(false),
+                            playerCount: $1.count(),
+                        )
+                    }
+
+                let privateTask = try await $privateRows.load(
+                    baseQuery.where { !$2.isShared.ifnull(false) },
                     animation: .default,
                 )
-                .task
+                let sharedTask = try await $sharedRows.load(
+                    baseQuery.where { $2.isShared.ifnull(false) },
+                    animation: .default,
+                )
+                _ = try await (privateTask.task, sharedTask.task)
+            }
+        }
+    }
+}
+
+private struct GamesSection: View {
+    let rows: [GamesView.Row]
+    @Dependency(\.defaultDatabase) var database
+
+    var body: some View {
+        ForEach(rows, id: \.game.id) { row in
+            NavigationLink {
+                GameView(game: row.game)
+            } label: {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(row.game.title).font(.headline)
+                        if row.isShared {
+                            Text("\(Image(systemName: "network")) Shared")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    Spacer()
+                    Text("\(row.playerCount)")
+                    Image(systemName: "person.2.fill").foregroundStyle(.gray)
+                }
+            }
+        }
+        .onDelete { offsets in
+            withErrorReporting {
+                try database.write { db in
+                    try Game.find(offsets.map { rows[$0].game.id })
+                        .delete()
+                        .execute(db)
+                }
             }
         }
     }
