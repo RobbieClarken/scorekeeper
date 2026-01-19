@@ -29,7 +29,9 @@ func appDatabase() throws -> any DatabaseWriter {
         try db.attachMetadatabase()
         #if DEBUG
             db.trace {
-                guard !SyncEngine.isSynchronizing else { return }
+                guard !SyncEngine.isSynchronizing,
+                    !$0.expandedDescription.hasPrefix("--")
+                else { return }
                 print($0.expandedDescription)
             }
         #endif
@@ -80,9 +82,6 @@ func appDatabase() throws -> any DatabaseWriter {
         ).execute(db)
     }
     try migrator.migrate(database)
-    if context == .preview {
-        try database.seed()
-    }
     return database
 }
 

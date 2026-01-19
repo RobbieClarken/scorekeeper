@@ -266,11 +266,11 @@ extension Optional {
     }
 }
 
+// swiftlint:disable force_try
 #Preview {
     let game = prepareDependencies {
-        // swiftlint:disable:next force_try
         try! $0.bootstrapDatabase()
-        // swiftlint:disable:next force_try
+        try! $0.defaultDatabase.seed()
         return try! $0.defaultDatabase.read { db in
             try Game.fetchOne(db)!
         }
@@ -280,3 +280,4 @@ extension Optional {
         GameView(game: game)
     }
 }
+// swiftlint:enable force_try

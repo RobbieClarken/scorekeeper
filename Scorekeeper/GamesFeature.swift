@@ -129,14 +129,17 @@ private struct GamesSection: View {
     @Previewable @Dependency(\.defaultSyncEngine) var syncEngine
     let _ = prepareDependencies {
         try! $0.bootstrapDatabase()
+        try? $0.defaultDatabase.seed()
     }
     NavigationStack {
         GamesView()
     }
     .task {
-        let game = try! await database.read { db in try Game.fetchOne(db)! }
-        try! await syncEngine.sendChanges()
-        _ = try! await syncEngine.share(record: game) { _ in }
+        do {
+            let game = try await database.read { db in try Game.fetchOne(db)! }
+            try await syncEngine.sendChanges()
+            _ = try! await syncEngine.share(record: game) { _ in }
+        } catch {}
     }
 }
 // swiftlint:enable force_try
