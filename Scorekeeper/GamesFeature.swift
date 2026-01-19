@@ -20,10 +20,13 @@ struct GamesView: View {
                     GameView(game: row.game)
                 } label: {
                     HStack {
-                        if row.isShared {
-                            Image(systemName: "network")
+                        VStack(alignment: .leading) {
+                            Text(row.game.title).font(.headline)
+                            if row.isShared {
+                                Text("\(Image(systemName: "network")) Shared")
+                                    .foregroundStyle(.secondary)
+                            }
                         }
-                        Text(row.game.title).font(.headline)
                         Spacer()
                         Text("\(row.playerCount)")
                         Image(systemName: "person.2.fill").foregroundStyle(.gray)
@@ -90,13 +93,22 @@ struct GamesView: View {
     }
 }
 
+// swiftlint:disable force_try
+// swiftlint:disable redundant_discardable_let
 #Preview {
-    // swiftlint:disable:next redundant_discardable_let
+    @Previewable @Dependency(\.defaultDatabase) var database
+    @Previewable @Dependency(\.defaultSyncEngine) var syncEngine
     let _ = prepareDependencies {
-        // swiftlint:disable:next force_try
         try! $0.bootstrapDatabase()
     }
     NavigationStack {
         GamesView()
     }
+    .task {
+        let game = try! await database.read { db in try Game.fetchOne(db)! }
+        try! await syncEngine.sendChanges()
+        _ = try! await syncEngine.share(record: game) { _ in }
+    }
 }
+// swiftlint:enable force_try
+// swiftlint:enable redundant_discardable_let
