@@ -4,9 +4,9 @@ import SQLiteData
 import SwiftUI
 
 @Observable class GameModel {
-    @Selection struct Row {
-        let player: Player
-        let imageData: Data?
+    @Selection struct Row: Equatable {
+        var player: Player
+        var imageData: Data?
     }
 
     let game: Game

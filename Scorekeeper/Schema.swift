@@ -2,19 +2,19 @@ import Dependencies
 import Foundation
 import SQLiteData
 
-@Table struct Game: Identifiable {
+@Table nonisolated struct Game: Identifiable {
     let id: UUID
     var title = ""
 }
 
-@Table struct Player: Identifiable {
+@Table nonisolated struct Player: Equatable, Identifiable {
     let id: UUID
     let gameID: Game.ID
     var name = ""
     var score = 0
 }
 
-@Table struct PlayerAsset: Identifiable {
+@Table nonisolated struct PlayerAsset: Identifiable {
     @Column(primaryKey: true)
     let playerID: Player.ID
     let imageData: Data
