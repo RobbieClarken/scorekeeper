@@ -11,7 +11,18 @@
 		DC5C84572EE69D7A005AEEFA /* SQLiteData in Frameworks */ = {isa = PBXBuildFile; productRef = DC5C84562EE69D7A005AEEFA /* SQLiteData */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		DC16EEE12F29949A00A27713 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC5C843F2EE69D20005AEEFA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DC5C84462EE69D20005AEEFA;
+			remoteInfo = Scorekeeper;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		DC16EEDD2F29949A00A27713 /* ScorekeeperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScorekeeperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC5C84472EE69D20005AEEFA /* Scorekeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scorekeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -26,6 +37,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		DC16EEDE2F29949A00A27713 /* ScorekeeperTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ScorekeeperTests;
+			sourceTree = "<group>";
+		};
 		DC5C84492EE69D20005AEEFA /* Scorekeeper */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -37,6 +53,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		DC16EEDA2F29949A00A27713 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DC5C84442EE69D20005AEEFA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -53,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				DC5C84492EE69D20005AEEFA /* Scorekeeper */,
+				DC16EEDE2F29949A00A27713 /* ScorekeeperTests */,
 				DC5C84482EE69D20005AEEFA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,6 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				DC5C84472EE69D20005AEEFA /* Scorekeeper.app */,
+				DC16EEDD2F29949A00A27713 /* ScorekeeperTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,6 +93,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		DC16EEDC2F29949A00A27713 /* ScorekeeperTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC16EEE32F29949A00A27713 /* Build configuration list for PBXNativeTarget "ScorekeeperTests" */;
+			buildPhases = (
+				DC16EED92F29949A00A27713 /* Sources */,
+				DC16EEDA2F29949A00A27713 /* Frameworks */,
+				DC16EEDB2F29949A00A27713 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DC16EEE22F29949A00A27713 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DC16EEDE2F29949A00A27713 /* ScorekeeperTests */,
+			);
+			name = ScorekeeperTests;
+			packageProductDependencies = (
+			);
+			productName = ScorekeeperTests;
+			productReference = DC16EEDD2F29949A00A27713 /* ScorekeeperTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		DC5C84462EE69D20005AEEFA /* Scorekeeper */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DC5C84522EE69D22005AEEFA /* Build configuration list for PBXNativeTarget "Scorekeeper" */;
@@ -102,6 +150,10 @@
 				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
+					DC16EEDC2F29949A00A27713 = {
+						CreatedOnToolsVersion = 26.1.1;
+						TestTargetID = DC5C84462EE69D20005AEEFA;
+					};
 					DC5C84462EE69D20005AEEFA = {
 						CreatedOnToolsVersion = 26.1.1;
 					};
@@ -126,11 +178,19 @@
 			projectRoot = "";
 			targets = (
 				DC5C84462EE69D20005AEEFA /* Scorekeeper */,
+				DC16EEDC2F29949A00A27713 /* ScorekeeperTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		DC16EEDB2F29949A00A27713 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DC5C84452EE69D20005AEEFA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -141,6 +201,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		DC16EED92F29949A00A27713 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DC5C84432EE69D20005AEEFA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -150,7 +217,57 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		DC16EEE22F29949A00A27713 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DC5C84462EE69D20005AEEFA /* Scorekeeper */;
+			targetProxy = DC16EEE12F29949A00A27713 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		DC16EEE42F29949A00A27713 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9SYL6AQV7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.invariance.ScorekeeperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Scorekeeper.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Scorekeeper";
+			};
+			name = Debug;
+		};
+		DC16EEE52F29949A00A27713 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = C9SYL6AQV7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.invariance.ScorekeeperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Scorekeeper.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Scorekeeper";
+			};
+			name = Release;
+		};
 		DC5C84502EE69D22005AEEFA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -343,6 +460,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		DC16EEE32F29949A00A27713 /* Build configuration list for PBXNativeTarget "ScorekeeperTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC16EEE42F29949A00A27713 /* Debug */,
+				DC16EEE52F29949A00A27713 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		DC5C84422EE69D20005AEEFA /* Build configuration list for PBXProject "Scorekeeper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
