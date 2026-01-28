@@ -26,6 +26,7 @@ func appDatabase() throws -> any DatabaseWriter {
     @Dependency(\.context) var context
     var configuration = Configuration()
     configuration.prepareDatabase { db in
+        db.add(function: $uuid)
         try db.attachMetadatabase()
         #if DEBUG
             db.trace {
@@ -110,4 +111,10 @@ extension DatabaseWriter {
             }
         }
     }
+}
+
+@DatabaseFunction
+nonisolated var uuid: UUID {
+    @Dependency(\.uuid) var uuid
+    return uuid()
 }
