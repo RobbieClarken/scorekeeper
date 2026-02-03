@@ -25,6 +25,7 @@ import SwiftUI
     var updatePlayerImageTask: Task<Void, Never>?
     var sharedRecord: SharedRecord?
     @ObservationIgnored @FetchAll var rows: [Row]
+    @ObservationIgnored @FetchOne var isShared = false
     @ObservationIgnored @Dependency(\.defaultDatabase) var database
     @ObservationIgnored @Dependency(\.defaultSyncEngine) var syncEngine
 
@@ -77,6 +78,12 @@ import SwiftUI
         }
     }
 
+    func stopSharingButtonTapped() async {
+        await withErrorReporting {
+            try await syncEngine.unshare(record: game)
+        }
+    }
+
     func deletePlayers(at offsets: IndexSet) {
         withErrorReporting {
             try database.write { db in
@@ -113,13 +120,16 @@ import SwiftUI
 
     private func reloadData() async {
         await withErrorReporting {
-            _ = try await $rows.load(
+            try await $rows.load(
                 Player
                     .where { $0.gameID.eq(game.id) }
                     .order { if sortAscending { $0.score.asc() } else { $0.score.desc() } }
                     .leftJoin(PlayerAsset.all) { $0.id.eq($1.playerID) }
                     .select { Row.Columns(player: $0, imageData: $1.imageData) },
                 animation: .default,
+            )
+            try await $isShared.load(
+                SyncMetadata.find(game.syncMetadataID).select(\.isShared)
             )
         }
     }
@@ -153,6 +163,17 @@ struct GameView: View {
 
     var body: some View {
         Form {
+            if model.isShared {
+                HStack {
+                    Text("Shared with others")
+                    Spacer()
+                    Button("Stop sharing", role: .destructive) {
+                        Task {
+                            await model.stopSharingButtonTapped()
+                        }
+                    }
+                }
+            }
             if !model.$rows.isLoading, model.rows.isEmpty {
                 ContentUnavailableView {
                     Label("No players", systemImage: "person.3.fill")
