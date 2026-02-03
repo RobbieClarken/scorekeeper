@@ -24,14 +24,18 @@ extension BaseSuite {
     )
 
     struct GameFeatureTests {
+        let model: GameModel
         @Dependency(\.defaultDatabase) var database
 
-        func basics() async throws {
+        init() async throws {
             let game = try await #require(
-                database.read { db in try Game.find(UUID(-1)).fetchOne(db) }
+                _database.wrappedValue.read { db in try Game.find(UUID(-1)).fetchOne(db) }
             )
-            let model = GameModel(game: game)
+            model = GameModel(game: game)
             await model.task()
+        }
+
+        func basics() async throws {
             expectNoDifference(
                 model.rows,
                 [
@@ -46,31 +50,18 @@ extension BaseSuite {
         }
 
         @Test() func addPlayer() async throws {
-            let game = try await #require(
-                database.read { db in try Game.find(UUID(-1)).fetchOne(db) }
-            )
-            let model = GameModel(game: game)
-            await model.task()
-
-            model.addPlayerButtonTapped()
-            model.newPlayerName = "P4"
-            model.saveNewPlayerButtonTapped()
-
-            try await model.$rows.load()
-
-            expectNoDifference(
-                model.rows,
-                [
+            await expectDifference(model.rows) {
+                model.addPlayerButtonTapped()
+                model.newPlayerName = "P4"
+                model.saveNewPlayerButtonTapped()
+                try await model.$rows.load()
+            } changes: { rows in
+                rows.append(
                     GameModel.Row(
-                        player: Player(id: UUID(-2), gameID: UUID(-1), name: "P2", score: 3)),
-                    GameModel.Row(
-                        player: Player(id: UUID(-3), gameID: UUID(-1), name: "P3", score: 2)),
-                    GameModel.Row(
-                        player: Player(id: UUID(-1), gameID: UUID(-1), name: "P1", score: 1)),
-                    GameModel.Row(
-                        player: Player(id: UUID(0), gameID: UUID(-1), name: "P4", score: 0)),
-                ]
-            )
+                        player: Player(id: UUID(0), gameID: UUID(-1), name: "P4", score: 0)
+                    )
+                )
+            }
         }
 
     }
